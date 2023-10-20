@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id            Int           @id @default(autoincrement())
+  role          String        @unique
+  hierarchy     Int           @default(1)
+  active        Boolean       @default(true)
+  createdBy     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedBy     Int?
+  updatedAt     DateTime      @updatedAt
+  users         User[]
+}
+
+model User {
+  id            Int           @id @default(autoincrement())
+  name          String
+  username      String        @unique
+  password      String
+  superior      Int           @default(0)
+  active        Boolean       @default(true)
+  createdBy     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedBy     Int?
+  updatedAt     DateTime      @updatedAt
+  role          Role          @relation(fields: [roleId], references: [id])
+  roleId        Int
+  tasks         Task[]
+}
+
+model Task {
+  id            Int           @id @default(autoincrement())
+  title         String        @unique
+  description   String?
+  assignedTo    Int
+  status        String        @default("P")
+  dueDate       String
+  startDate     String?
+  endDate       String?
+  active        Boolean       @default(true)
+  createdBy     Int           @default(0)
+  createdAt     DateTime      @default(now())
+  updatedBy     Int?
+  updatedAt     DateTime      @updatedAt
+  assigned      User          @relation(fields: [assignedTo], references: [id])
+}
